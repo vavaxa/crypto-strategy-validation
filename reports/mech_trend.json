@@ -1,0 +1,202 @@
+{
+ "best": "brk20/10|bare",
+ "gates": {
+  "P1": "INCONCLUSIVE",
+  "P2": "AGAINST",
+  "P3": "INCONCLUSIVE",
+  "P4": "AGAINST",
+  "P5": "INCONCLUSIVE",
+  "P6": "UNTESTABLE"
+ },
+ "point6": false,
+ "drag": 0.00030000000000000003,
+ "leak_diff": 1.1102230246251565e-16,
+ "pts": {
+  "1.0": {
+   "1": [
+    false,
+    "DSR=0.493 (p=0.507); SR*=0.62 ann vs obs 0.61; PSR(0)=0.918"
+   ],
+   "2": [
+    false,
+    "PBO=0.600 (12870 CSCV partitions)"
+   ],
+   "3": [
+    false,
+    "SPA p: BTC buy&hold=1.000 (WRC 0.953); SMA100 equal-weight=0.357 (WRC 0.528)"
+   ],
+   "4": [
+    false,
+    "net Sharpe 0.61 vs BTC B&H 0.82, SMA100 0.33 (CAGR 20.0% vs 37.3% / 3.2%)"
+   ],
+   "5": [
+    false,
+    "holdout net Sharpe -0.13, CAGR -14.9%, maxDD -47.3% vs IS Sharpe 0.61 (rule: >0 and >= 0.5x IS)"
+   ],
+   "6": [
+    false,
+    "P1=INCONCLUSIVE; FOR among P2-P6 = 0; any AGAINST = True; gates={'P1': 'INCONCLUSIVE', 'P2': 'AGAINST', 'P3': 'INCONCLUSIVE', 'P4': 'AGAINST', 'P5': 'INCONCLUSIVE', 'P6': 'UNTESTABLE'}"
+   ],
+   "7": [
+    false,
+    "NOT RUN in this environment (replication is designated for the cloud on Bybit); counts as not satisfied"
+   ]
+  },
+  "0.5": {
+   "1": [
+    false,
+    "DSR=0.779 (p=0.221); SR*=0.58 ann vs obs 0.92; PSR(0)=0.981"
+   ],
+   "2": [
+    false,
+    "PBO=0.488 (12870 CSCV partitions)"
+   ],
+   "3": [
+    false,
+    "SPA p: BTC buy&hold=0.791 (WRC 0.794); SMA100 equal-weight=0.059 (WRC 0.227)"
+   ],
+   "4": [
+    true,
+    "net Sharpe 0.92 vs BTC B&H 0.82, SMA100 0.45 (CAGR 43.6% vs 37.3% / 10.0%)"
+   ],
+   "5": [
+    false,
+    "holdout net Sharpe 0.22, CAGR -0.5%, maxDD -42.2% vs IS Sharpe 0.92 (rule: >0 and >= 0.5x IS)"
+   ]
+  },
+  "2.0": {
+   "1": [
+    false,
+    "DSR=0.019 (p=0.981); SR*=0.77 ann vs obs -0.13; PSR(0)=0.382"
+   ],
+   "2": [
+    false,
+    "PBO=0.606 (12870 CSCV partitions)"
+   ],
+   "3": [
+    false,
+    "SPA p: BTC buy&hold=1.000 (WRC 0.999); SMA100 equal-weight=0.875 (WRC 0.913)"
+   ],
+   "4": [
+    false,
+    "net Sharpe -0.13 vs BTC B&H 0.82, SMA100 0.08 (CAGR -4.0% vs 37.3% / -9.2%)"
+   ],
+   "5": [
+    false,
+    "holdout net Sharpe -0.02, CAGR -1.9%, maxDD -20.8% vs IS Sharpe -0.13 (rule: >0 and >= 0.5x IS)"
+   ]
+  }
+ },
+ "holdout": {
+  "1.0": {
+   "best": "brk20/10|bare",
+   "strat": {
+    "sharpe": -0.12965709003997833,
+    "cagr": -0.14915693701475086,
+    "maxdd": -0.47253414432769003,
+    "ret": -0.193875936534323
+   },
+   "is_": {
+    "sharpe": 0.6097737933937722,
+    "cagr": 0.19979651263537557,
+    "maxdd": -0.7489954864138963,
+    "ret": 1.6436024901859958
+   },
+   "btc": {
+    "sharpe": -0.33177756177779666,
+    "cagr": -0.20053006614050717,
+    "maxdd": -0.5372193030799224,
+    "ret": -0.2581534482876068
+   },
+   "sma": {
+    "sharpe": -0.6938643494199428,
+    "cagr": -0.30364241744013465,
+    "maxdd": -0.5124846873404373,
+    "ret": -0.38297956663628885
+   },
+   "turn": 0.1165945170841594,
+   "expo": 0.45136502227981196,
+   "gross": {
+    "sharpe": 0.6206160296269665,
+    "cagr": 0.19472724359130922,
+    "maxdd": -0.3885962592148613,
+    "ret": 0.26793090579321843
+   }
+  },
+  "0.5": {
+   "best": "brk20/10|bare",
+   "strat": {
+    "sharpe": 0.21655543199466332,
+    "cagr": -0.005101335369052773,
+    "maxdd": -0.4224314178039452,
+    "ret": -0.006800629819599724
+   },
+   "is_": {
+    "sharpe": 0.9170830145491292,
+    "cagr": 0.4363670795618826,
+    "maxdd": -0.6724269924916334,
+    "ret": 5.90754168241925
+   },
+   "btc": {
+    "sharpe": -0.33177756177779666,
+    "cagr": -0.20053006614050717,
+    "maxdd": -0.5372193030799224,
+    "ret": -0.2581534482876068
+   },
+   "sma": {
+    "sharpe": -0.5440996901346181,
+    "cagr": -0.260378782241778,
+    "maxdd": -0.47905216975148257,
+    "ret": -0.3313079051773665
+   },
+   "turn": 0.1165945170841594,
+   "expo": 0.45136502227981196,
+   "gross": {
+    "sharpe": 0.6206160296269665,
+    "cagr": 0.19472724359130922,
+    "maxdd": -0.3885962592148613,
+    "ret": 0.26793090579321843
+   }
+  },
+  "2.0": {
+   "best": "tsmom30|+oi",
+   "strat": {
+    "sharpe": -0.019479268134882675,
+    "cagr": -0.018822577846364097,
+    "maxdd": -0.20848228962573023,
+    "ret": -0.025034626666065152
+   },
+   "is_": {
+    "sharpe": -0.12997525935745247,
+    "cagr": -0.040301737535986315,
+    "maxdd": -0.5427014943669919,
+    "ret": -0.1971152960979874
+   },
+   "btc": {
+    "sharpe": -0.33177756177779666,
+    "cagr": -0.20053006614050717,
+    "maxdd": -0.5372193030799224,
+    "ret": -0.2581534482876068
+   },
+   "sma": {
+    "sharpe": -0.9938409102218709,
+    "cagr": -0.38276577437277803,
+    "maxdd": -0.5753125594579622,
+    "ret": -0.4746985135754578
+   },
+   "turn": 0.01820045374206896,
+   "expo": 0.09850613181411733,
+   "gross": {
+    "sharpe": 0.9503929727739826,
+    "cagr": 0.1647498964734153,
+    "maxdd": -0.16279326051847598,
+    "ret": 0.2256620157117284
+   }
+  }
+ },
+ "best_by_mult": {
+  "1.0": "brk20/10|bare",
+  "0.5": "brk20/10|bare",
+  "2.0": "tsmom30|+oi"
+ }
+}

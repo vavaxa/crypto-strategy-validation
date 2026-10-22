@@ -1,0 +1,14 @@
+# data is reconstructible from public APIs — never commit it
+data/*.parquet
+data/**/*.parquet
+*.parquet
+# python
+**/__pycache__/
+*.pyc
+.venv/
+venv/
+# secrets (belt-and-suspenders — none live here, keep it that way)
+.env
+.env.*
+*.key
+*.pem

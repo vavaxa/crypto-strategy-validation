@@ -1,0 +1,12 @@
+# core
+pandas>=2.1
+numpy>=1.26
+scipy>=1.11
+pyarrow>=14
+# data collectors (public APIs)
+requests>=2.31
+# optional: regime detection in validation/regimes.py (degrades gracefully if absent)
+hmmlearn>=0.3
+scikit-learn>=1.3
+# dev
+pytest>=7.4
