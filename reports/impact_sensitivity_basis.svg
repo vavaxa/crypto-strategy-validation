@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 430" font-family="system-ui,Segoe UI,Helvetica,Arial,sans-serif">
+<rect width="860" height="430" fill="#ffffff"/>
+<text x="76" y="26" font-size="15" font-weight="700" fill="#111">Delta-neutral basis carry: net return vs impact coefficient k</text>
+<text x="76" y="44" font-size="12" fill="#555">the published FAIL used k=0.5 (a ~20-30x-overstated stub); the deciding region was never swept</text>
+<rect x="190.6" y="58" width="343.8" height="318" fill="#f59e0b" fill-opacity="0.12"/>
+<text x="362.5" y="72" font-size="11" fill="#b45309" text-anchor="middle">realistic k = Y·σ (~0.015–0.06)</text>
+<line x1="76" y1="173.6" x2="840" y2="173.6" stroke="#bbb" stroke-dasharray="4 3"/>
+<text x="840" y="168.6" font-size="11" fill="#999" text-anchor="end">net = 0</text>
+<line x1="76" y1="347.1" x2="72" y2="347.1" stroke="#999"/>
+<text x="68" y="351.1" font-size="10" fill="#888" text-anchor="end">-1200</text>
+<line x1="76" y1="289.3" x2="72" y2="289.3" stroke="#999"/>
+<text x="68" y="293.3" font-size="10" fill="#888" text-anchor="end">-800</text>
+<line x1="76" y1="231.5" x2="72" y2="231.5" stroke="#999"/>
+<text x="68" y="235.5" font-size="10" fill="#888" text-anchor="end">-400</text>
+<line x1="76" y1="173.6" x2="72" y2="173.6" stroke="#999"/>
+<text x="68" y="177.6" font-size="10" fill="#888" text-anchor="end">0</text>
+<line x1="76" y1="115.8" x2="72" y2="115.8" stroke="#999"/>
+<text x="68" y="119.8" font-size="10" fill="#888" text-anchor="end">400</text>
+<line x1="76" y1="58.0" x2="72" y2="58.0" stroke="#999"/>
+<text x="68" y="62.0" font-size="10" fill="#888" text-anchor="end">800</text>
+<text x="18" y="217.0" font-size="11" fill="#666" transform="rotate(-90 18 217.0)" text-anchor="middle">net bps/yr</text>
+<line x1="76.0" y1="376" x2="76.0" y2="380" stroke="#999"/>
+<text x="76.0" y="394" font-size="10" fill="#888" text-anchor="middle">0</text>
+<line x1="228.8" y1="376" x2="228.8" y2="380" stroke="#999"/>
+<text x="228.8" y="394" font-size="10" fill="#888" text-anchor="middle">0.02</text>
+<line x1="381.6" y1="376" x2="381.6" y2="380" stroke="#999"/>
+<text x="381.6" y="394" font-size="10" fill="#888" text-anchor="middle">0.04</text>
+<line x1="534.4" y1="376" x2="534.4" y2="380" stroke="#999"/>
+<text x="534.4" y="394" font-size="10" fill="#888" text-anchor="middle">0.06</text>
+<line x1="687.2" y1="376" x2="687.2" y2="380" stroke="#999"/>
+<text x="687.2" y="394" font-size="10" fill="#888" text-anchor="middle">0.08</text>
+<line x1="840.0" y1="376" x2="840.0" y2="380" stroke="#999"/>
+<text x="840.0" y="394" font-size="10" fill="#888" text-anchor="middle">0.1</text>
+<text x="458.0" y="416" font-size="11" fill="#666" text-anchor="middle">impact coefficient k</text>
+<line x1="76.0" y1="86.0" x2="840.0" y2="366.4" stroke="#dc2626" stroke-width="2.5"/>
+<circle cx="315.1" cy="173.6" r="4" fill="#dc2626"/>
+<text x="321.1" y="165.6" font-size="11" fill="#dc2626">breakeven k ≈ 0.031</text>
+<text x="840" y="368.0" font-size="11" fill="#777" text-anchor="end">stub k=0.5 → net −9091 bps/yr (far below axis)</text>
+</svg>

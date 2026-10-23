@@ -5,8 +5,12 @@ ASSUMPTIONS / STUBS (explicit):
     pays no borrow (only funding); set >0 to stress synthetic short financing / spot margin.
   * Position value for funding/borrow = signed cumulative trade notional (cost basis);
     no mark-price path is available, so mark-to-market drift is ignored.
-  * impact k=0.5 is a placeholder (bps-of-price per sqrt(participation) in "Almgren" form
-    impact_frac = k*sqrt(q/ADV)); calibrate on real fills. Makers pay no impact.
+  * impact uses the square-root law impact_frac = k*sqrt(q/ADV) ("Almgren" form). The
+    coefficient k is NOT a constant: by that law k ~= Y*sigma_daily (Y~0.5-1), so it is
+    per-symbol -- BTC ~0.015-0.03, high-vol alts ~0.05-0.08. The default impact_k=0.5 is a
+    DELIBERATELY CONSERVATIVE STUB that overstates realistic impact ~20-30x (e.g. $1M in BTC
+    is single-digit bps, not ~70bp). Use impact_k_from_vol() for a calibrated per-symbol
+    value; cost-sensitive verdicts MUST be read as impact-calibration-dependent. Makers: none.
   * funding_default_rate_8h=0.0 when market_df has no funding_rate (funding then 0).
 Conventions: costs are positive = money lost; funding may be negative (received).
 """
@@ -22,7 +26,7 @@ FUNDING_INTERVAL = pd.Timedelta(hours=8)
 class CostParams:
     taker_fee: float = 0.00045        # 0.045% Binance USD-M taker
     maker_fee: float = 0.00018        # 0.018% (as specified)
-    impact_k: float = 0.5             # impact_frac = k*sqrt(notional/ADV)   [STUB]
+    impact_k: float = 0.5             # CONSERVATIVE STUB; ~20-30x high. Prefer impact_k_from_vol()
     min_spread_bps: float = 1.0       # full spread floor; taker pays >= half of it
     maker_impact: bool = False        # makers pay no impact/spread
     borrow_rate_annual: float = 0.0   # short financing, STUB (see module doc)
@@ -61,6 +65,18 @@ def impact_bps(notional, adv, params, is_maker=False):
         return out
     return np.where(np.asarray(is_maker, bool), 0.0, out)
 
+
+
+def impact_k_from_vol(sigma_daily, Y=0.5):
+    """Calibrated per-symbol square-root-impact coefficient k = Y * sigma_daily.
+
+    The square-root law gives impact_frac = Y * sigma * sqrt(participation) with Y~0.5-1,
+    so the coefficient in impact_frac = k*sqrt(q/ADV) is k = Y*sigma_daily, i.e. per-symbol,
+    not a global constant. Example: BTC sigma_daily~0.03 -> k~0.015; alt sigma_daily~0.08 ->
+    k~0.04. Feed the resulting k into CostParams(impact_k=...) per symbol. Y is a free
+    parameter that should be fixed in a pre-registration, then stress-swept (sigma/2, sigma, 2 sigma).
+    """
+    return Y * np.asarray(sigma_daily, float)
 
 def apply_participation_cap(trades_df, market_df, params):
     """Split orders into child fills capped at participation_cap*bar_volume_usd per bar.

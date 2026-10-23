@@ -1,3 +1,10 @@
+> **⚠️ CORRECTION (2026-10).** Scored with an uncalibrated impact stub (`impact_k=0.5`, ~20–30× too
+> high; true `k≈Y·σ`~0.015–0.06). Net crosses zero at `impact_k≈0.031`; the swept grid (0.125–2) never
+> reached it. Correct label: **INCONCLUSIVE (impact-calibration-dependent)**, not a confirmed fail. See
+> repo README «Correction». Re-run with calibrated per-symbol `k` pending.
+
+---
+
 # FORM-N delta-neutral basis carry (long spot / short perp) - PREREG_CARRY.md FORM-N
 
 Generated 2026-10-19 15:20:01. ONE primary config `w7d|z|vt|1d (long spot / short perp)` (hyperparameters fixed = best FORM-L; n_trials=1, no grid). Window 2020-03-01..2026-10-18 (2423 d); IS ..2025-06-20; holdout from 2025-06-21 (last 20%).

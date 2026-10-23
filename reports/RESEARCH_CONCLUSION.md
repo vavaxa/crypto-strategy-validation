@@ -1,3 +1,13 @@
+> **⚠️ CORRECTION (2026-10) — cost-sensitive verdicts relabelled.** Studies 2 (trend), 3 (funding
+> carry) and 5 (basis carry) were scored with an uncalibrated square-root-impact stub (`impact_k=0.5`)
+> that overstates realistic impact ~20–30×; the true coefficient is per-symbol `k≈Y·σ` (~0.015–0.06).
+> For basis carry, net return crosses zero at `impact_k≈0.031` while the sweep spanned only 0.125–2, so
+> the deciding region was never tested (and the −99.8% maxDD on a delta-neutral book was a cost-model
+> artifact). Correct label: **INCONCLUSIVE (impact-calibration-dependent)**, not a confirmed fail. The
+> validation core is unaffected and was independently verified. Re-run with calibrated `k` pending.
+
+---
+
 # Итог исследования: есть ли торгуемый сигнальный край для одиночного оператора
 
 Дата закрытия: 2026-10-19. Решение оператора: остановить поиск, зафиксировать результат.

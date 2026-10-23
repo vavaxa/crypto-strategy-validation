@@ -1,3 +1,10 @@
+> **⚠️ CORRECTION (2026-10).** Scored with an uncalibrated impact stub (`impact_k=0.5`, ~20–30× too
+> high; true `k≈Y·σ`~0.015–0.06). Net crosses zero at `impact_k≈0.031`; the swept grid (0.125–2) never
+> reached it. Correct label: **INCONCLUSIVE (impact-calibration-dependent)**, not a confirmed fail. See
+> repo README «Correction». Re-run with calibrated per-symbol `k` pending.
+
+---
+
 # Mechanism study: trend/breakout on Binance USDT-perps (daily)
 
 Generated 2026-10-19 11:04 UTC by `research/mech_runner.py`. Pre-registration frozen; grid/decision rule unchanged.

@@ -12,3 +12,6 @@ venv/
 .env.*
 *.key
 *.pem
+
+# hyperliquid raw snapshots (reconstructible from public API)
+data/hl/

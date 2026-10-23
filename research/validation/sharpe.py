@@ -184,7 +184,7 @@ def sharpe_lo(returns, q=1, nw_lag=None, ddof=1):
     moment covariance, so it is robust to autocorrelation and non-normality.
     With moments theta = (mu, m2) where m2 = E[r^2] and SR = mu / sqrt(m2 - mu^2),
     gradient d = (dSR/dmu, dSR/dm2):
-        dSR/dmu = (1/sigma) * (1 + SR^2)      ... wait see code; computed exactly
+        dSR/dmu = (1 + SR^2) / sigma          (since m2 = sigma^2 * (1 + SR^2))
         dSR/dm2 = -SR / (2 * sigma^2)
     Var(SR_hat) = d' S d / T, S = HAC cov of (r - mu, r^2 - m2).
 
