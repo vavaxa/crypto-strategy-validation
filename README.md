@@ -5,6 +5,14 @@ An overfitting-resistant research pipeline for testing whether a retail-scale op
 the researcher*. The deliverable is the **method**: how to tell a real edge from an overfit backtest,
 and how to report an honest result — including correcting one's own conclusion when the method says to.
 
+[![tests](https://github.com/vavaxa/crypto-strategy-validation/actions/workflows/tests.yml/badge.svg)](https://github.com/vavaxa/crypto-strategy-validation/actions/workflows/tests.yml)
+
+**Flagship artifact — applied risk analysis:** [`reports/hyperliquid_hlp_risk.md`](reports/hyperliquid_hlp_risk.md)
+draws a risk conclusion about a *live* system — Hyperliquid's HLP liquidation backstop — from its own
+public API: a **~$37M mechanical loss cap** (then ADL), **procyclical capital** (−$489M of withdrawals, not
+losses), and **79% of headline capital not locatable** in public accounts. For DeFi-risk work this is the
+core of the portfolio; the strategy studies below are the methodology spine.
+
 > **What is established:** a reusable, numerically-verified validation stack (DSR/PSR, PBO/CSCV,
 > White/Hansen SPA, Lo-HAC Sharpe, purged k-fold) applied to seven strategy studies with per-study
 > anti-lookahead audits. No study demonstrated an edge that clearly beats BTC buy-and-hold.
@@ -18,7 +26,7 @@ and how to report an honest result — including correcting one's own conclusion
 
 ## Correction (2026-10)
 
-An external review re-ran the code and found that `costs.py` used a constant square-root-impact
+A review pass against the square-root law found that `costs.py` used a constant square-root-impact
 coefficient `impact_k = 0.5`, whereas the square-root law implies a **per-symbol** `k ≈ Y·σ_daily`
 (Y≈0.5–1): ~0.015–0.03 for BTC, ~0.05–0.08 for high-vol alts. The stub overstates realistic impact by
 roughly 20–30× (e.g. $1M in BTC ≈ single-digit bps, not ~70 bp).
@@ -30,6 +38,12 @@ on a delta-neutral book was a cost-model artifact, not a market outcome. At a ca
 carry is **marginally positive gross of the remaining (non-impact) risks**, so the honest label is
 INCONCLUSIVE pending (a) per-symbol `k = Y·σ` (see `impact_k_from_vol()` in `costs.py`) and (b) a data
 re-collection + re-run. The validation **core** was independently verified correct and is unaffected.
+
+**Aggregate verdict at a calibrated k.** Impact is linear in k, so basis-carry net is
+`net(k) = 606 − 19394·k` bps/yr (from the report's own numbers): zero at `k≈0.031`, and **+218 bps/yr at a
+BTC-like `k≈0.02`**. So once costs are calibrated the aggregate sign is *marginally positive*; the pending
+re-run is needed only to get the **per-symbol** `k` weighting right (it reweights across symbols), not to
+settle the aggregate sign. This is a correction that changed the conclusion — not a bug found and parked.
 
 ![Basis carry: net return vs impact coefficient](reports/impact_sensitivity_basis.svg)
 

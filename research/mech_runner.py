@@ -2,7 +2,7 @@
 
 Usage:  .venv/bin/python research/mech_runner.py [--force]
 Output: reports/mech_trend.md, reports/mech_trend.json ; cache in research/mech_cache/ (resumable).
-Grid, sizing, risk, decision rule are FROZEN (PREREGISTRATION.md); nothing here tunes them.
+Grid, sizing, risk, decision rule are FROZEN (PREREG_MECH.md); nothing here tunes them.
 Everything is wired from existing modules: strategy/trend.py, execution/costs.py, validation/*.
 """
 from __future__ import annotations

@@ -1,7 +1,7 @@
 # Hyperliquid HLP: a ~$37M mechanical loss cap, procyclical capital, and a backstop that ends in ADL
 
-*Independent risk note. Snapshot: 2026-10-22 (live cross-checks 2026-10-23), from the keyless Hyperliquid
-`info` API. Reproducible — collector and calculations in
+*Independent risk note. Snapshot: 2026-10-23, from the keyless Hyperliquid
+`info` API (`vaultDetails` + `clearinghouseState` + `spotClearinghouseState`). Reproducible — collector and calculations in
 [`research/hl_collect.py`](../research/hl_collect.py),
 [`research/hl_analysis.py`](../research/hl_analysis.py),
 [`research/hl_risk_calcs.py`](../research/hl_risk_calcs.py),

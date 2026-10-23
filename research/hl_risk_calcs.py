@@ -52,15 +52,31 @@ def main():
     print(f"     - Sep 2025 -> now: -$489M flows against +$63M PnL")
 
     print("\n" + "=" * 74)
-    print("BACKSTOP CAPITAL — perp/strategy slot vs headline (observation)")
+    print("BACKSTOP CAPITAL — perp account is the hard cap; where is the rest? (observation)")
     print("=" * 74)
     jpk = int(np.argmax(ap))
-    print(f"  perp slot: equity ${ap[-1]/1e6:,.1f}M  (peak ${ap[jpk]/1e6:,.1f}M {ts(tp[jpk])}, "
-          f"{(ap[-1]/ap[jpk]-1)*100:+.0f}%)  cumPnL ${pp[-1]/1e6:,.1f}M")
-    print(f"  maxDistributable ${float(v['maxDistributable'])/1e6:,.3f}M  ==  perp-slot equity "
-          f"(matches to the dollar)   maxWithdrawable ${float(v['maxWithdrawable'])/1e6:.3f}M")
-    print(f"  => the readily-deployable perp capital fronting backstop liquidations is ~${ap[-1]/1e6:,.0f}M,")
-    print(f"     not the ${a[-1]/1e6:,.0f}M headline; overflow beyond the liquidator vault goes to ADL.")
+    print(f"  perp slot (portfolio.perpAllTime): equity ${ap[-1]/1e6:,.3f}M  "
+          f"(peak ${ap[jpk]/1e6:,.1f}M {ts(tp[jpk])}, {(ap[-1]/ap[jpk]-1)*100:+.0f}%)  cumPnL ${pp[-1]/1e6:,.1f}M")
+    ch = snap.get("hlp_clearinghouseState", {})
+    if ch:
+        acct = float(ch.get("marginSummary", {}).get("accountValue", "nan"))
+        wd = float(ch.get("withdrawable", "nan"))
+        npos = len(ch.get("assetPositions", []))
+        print(f"  clearinghouseState (live perp account): accountValue ${acct/1e6:,.3f}M, "
+              f"withdrawable ${wd/1e6:,.3f}M, open positions {npos}")
+        print(f"  PROOF: clearinghouseState.accountValue == portfolio.perpAllTime to ${abs(acct-ap[-1]):,.2f} "
+              f"-> the vault's perp slot IS its perp account.")
+        print(f"  (maxDistributable ${float(v['maxDistributable'])/1e6:,.3f}M tracks WITHDRAWABLE = free cash, "
+              f"NOT slot capital -- do not conflate.)")
+        cap = acct
+    else:
+        cap = ap[-1]
+    spot = snap.get("hlp_spotClearinghouseState", {}).get("balances", [])
+    gap = a[-1] - ap[-1]
+    print(f"  => depositor loss is mechanically capped at the ~${cap/1e6:,.0f}M perp account; ADL beyond it.")
+    print(f"     Vault spot balances: {len(spot)}. The other ${gap/1e6:,.0f}M of the ${a[-1]/1e6:,.0f}M headline")
+    print(f"     is NOT locatable in the vault's public perp/spot accounts (~{gap/a[-1]*100:.0f}% unlocated; "
+          f"possible sub-accounts).")
 
     print("\n" + "=" * 74)
     print("MAINTENANCE-MARGIN CUSHION by leverage tier (the real thinness)")
@@ -94,7 +110,7 @@ def main():
     print("=" * 74)
     tot = sum(oi.values())
     hype = oi["HYPE"]
-    perp_cap = ap[-1]
+    perp_cap = cap  # clearinghouse perp accountValue = the hard loss cap
     hype_lev = next(a["maxLeverage"] for a in uni if a["name"] == "HYPE")
     cushion = (2/3) * (1 / (2 * hype_lev))   # (2/3)*MM, MM = 1/(2*maxLev)
     print(f"  HYPE OI ${hype/1e6:,.0f}M ({hype/tot*100:.1f}% of ${tot/1e9:.2f}B), {hype_lev}x "

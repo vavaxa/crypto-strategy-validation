@@ -1,0 +1,10 @@
+# Pinned versions the test suite + studies were last run against (python 3.12).
+# Generated from the working environment; regenerate with `pip freeze` after upgrades.
+numpy==2.5.3
+pandas==3.0.6
+scipy==1.18.1
+pyarrow==25.0.1
+requests==2.34.2
+hmmlearn==0.3.3
+scikit-learn==1.9.1
+pytest==9.1.1
