@@ -95,20 +95,24 @@ def main():
     tot = sum(oi.values())
     hype = oi["HYPE"]
     perp_cap = ap[-1]
-    print(f"  HYPE OI ${hype/1e6:,.0f}M ({hype/tot*100:.1f}% of ${tot/1e9:.2f}B). No long/short split in")
-    print(f"  the API; funding is positive (longs pay), so longs likely dominate — but this is NOT")
-    print(f"  sized, so f below is an uncalibrated assumption.")
-    print(f"  loss = f * HYPE_OI * c, compared to the ~${perp_cap/1e6:,.0f}M perp/liquidator capital:")
+    hype_lev = next(a["maxLeverage"] for a in uni if a["name"] == "HYPE")
+    cushion = (2/3) * (1 / (2 * hype_lev))   # (2/3)*MM, MM = 1/(2*maxLev)
+    print(f"  HYPE OI ${hype/1e6:,.0f}M ({hype/tot*100:.1f}% of ${tot/1e9:.2f}B), {hype_lev}x "
+          f"(cushion (2/3)*MM = {cushion*100:.2f}%). No long/short split in the API; funding is positive")
+    print(f"  (longs pay), so longs likely dominate — but this is NOT sized, so f below is an assumption.")
+    print(f"  An inherited position only costs the vault BEYOND its margin cushion, so")
+    print(f"  loss = f * HYPE_OI * max(0, c - {cushion*100:.2f}%), vs the ~${perp_cap/1e6:,.0f}M perp cap:")
     fs = [0.05, 0.10, 0.20]; cs = [0.05, 0.10, 0.20, 0.30]
-    print("    f\\c  " + "".join(f"{int(c*100):>7}%" for c in cs) + "   (loss as % of perp capital)")
+    print("    f\\c  " + "".join(f"{int(c*100):>7}%" for c in cs) + "   (loss as % of perp cap)")
     for f in fs:
         row = f"   {int(f*100):>3}%  "
         for c in cs:
-            row += f"{f*hype*c/perp_cap*100:7.0f}"
+            row += f"{f*hype*max(0.0, c-cushion)/perp_cap*100:7.0f}"
         print(row)
-    print("  At f=20%, c=30%: loss ${:.0f}M vs ~${:.0f}M perp capital — i.e. the liquidator vault is"
-          .format(0.20*hype*0.30/1e6, perp_cap/1e6))
-    print("  exhausted and the remainder socialises via ADL. (Not a prediction; a sensitivity point.)")
+    loss2020 = 0.20 * hype * max(0.0, 0.20 - cushion)
+    print(f"  At f=20%, c=20%: loss ${loss2020/1e6:.0f}M vs ~${perp_cap/1e6:,.0f}M perp cap — liquidator")
+    print("  vault exhausted, remainder socialises via ADL. Follows from the protocol's own cushion; a")
+    print("  sensitivity point, not a prediction.")
 
 
 if __name__ == "__main__":

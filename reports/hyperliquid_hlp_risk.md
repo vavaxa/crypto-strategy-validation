@@ -1,7 +1,7 @@
-# Hyperliquid HLP: procyclical capital, idiosyncratic losses, and a backstop that leans on ADL
+# Hyperliquid HLP: a ~$37M mechanical loss cap, procyclical capital, and a backstop that ends in ADL
 
-*Independent risk note. Snapshot: 2026-10-22, from the keyless Hyperliquid `info` API.
-Reproducible — collector and calculations in
+*Independent risk note. Snapshot: 2026-10-22 (live cross-checks 2026-10-23), from the keyless Hyperliquid
+`info` API. Reproducible — collector and calculations in
 [`research/hl_collect.py`](../research/hl_collect.py),
 [`research/hl_analysis.py`](../research/hl_analysis.py),
 [`research/hl_risk_calcs.py`](../research/hl_risk_calcs.py),
@@ -9,110 +9,99 @@ Reproducible — collector and calculations in
 
 ## Summary
 
-A common framing is "HLP is a ~$177M insurance fund backstopping Hyperliquid, so compare it to open
-interest." That framing is wrong on both the numerator and the mechanism. Working from the public
-vault data and the protocol docs, three findings:
+The common framing — "HLP is a ~$177M insurance fund, compare it to open interest" — is wrong on the
+numerator, the mechanism, and the denominator. Working from the public vault data and the protocol docs:
 
-1. **The backstop is three-tier, and the capital that actually fronts it is ~$38M, not $177M.**
-   Liquidations hit the order book first; only positions below **2/3 of maintenance margin** are taken
-   over by the *liquidator vault* — "a component strategy of HLP" [[docs]](#sources) — and anything
-   beyond that socialises through **auto-deleveraging (ADL)**, the docs' "final safeguard." HLP's perp
-   slot (which houses that strategy) is **$37.6M**, and `maxDistributable` equals it to the dollar; the
-   $177M headline includes capital that is not first-loss backstop.
-2. **HLP capital is procyclical — it shrinks via withdrawals, not losses, exactly when it matters.**
-   Equity fell 71% from its $603.9M peak, but that was **−$489M of depositor withdrawals against
-   +$63M of PnL** — zero dollars of loss. This has happened twice in weeks (Mar-2025 and Sep-2025→now).
-   A backstop that is smallest right after stress is a feature worth pricing.
-3. **The genuinely thin cushion is BTC/ETH at max leverage — not the low-OI alts.** Maintenance margin
-   is half the initial margin at max leverage, so the cushion before the liquidator vault is underwater
-   is **~0.83% of notional on BTC (40x) and ~1.33% on ETH (25x)**, versus ~11% on a 3x long-tail asset.
-   And the worst *realized* event (JELLY) was idiosyncratic — an oracle/listing/manipulation failure
-   resolved by **validator governance** (market delisting) plus ADL, not by the buffer absorbing it.
+1. **Depositor losses are mechanically capped at the perp account's equity (~$37.3M), then ADL takes
+   over.** Auto-deleveraging triggers when an account's value goes negative and closes opposite positions
+   at the previous mark price, "ensuring that the platform has no bad debt" [[2]](#sources). So the HLP
+   perp account — live `clearinghouseState.accountValue` **$37.3M, zero open positions, ~fully
+   withdrawable** — is a *hard ceiling* on what depositors can lose before the loss is socialised by ADL,
+   not a "small share" of $177M.
+2. **That capital is procyclical and leaves under stress.** Equity fell from a sampled peak of $603.9M to
+   $177.4M — **−$489M of withdrawals against +$63M of PnL**, i.e. zero losses. It happened once sharply
+   (Mar-2025, five weeks) and again as a 13-month monotonic drain since Sep-2025. A backstop whose capital
+   reprices downward over time is the opposite of a growing reserve.
+3. **Only ~21% of the headline capital is locatable in public accounts.** The vault address shows $37.3M
+   of perp equity and **zero** spot balances; the other **$139.8M** of the reported $177.4M portfolio
+   equity does not appear at the vault or leader address. Likely sub-accounts/component strategies — but
+   not exposed by the public API, which is itself the finding.
 
-Net: HLP's demonstrated safety reflects (a) a regime in which book liquidity has absorbed most flow,
-(b) a capital base that leaves precisely when tested, and (c) a true backstop of last resort that is
-*other traders (ADL) and validators*, not a thick fund. None of this is visible if you divide $177M
-by open interest.
+And the genuinely thin margin cushion is **BTC/ETH at max leverage (~0.83% / ~1.33% of notional)**, the
+deepest books — not the low-OI alts a "share-of-OI" lens would flag.
 
-## Background: the three-tier liquidation path
+## Background: book → liquidator vault → ADL
 
-Per the Hyperliquid docs (see [Sources](#sources)):
+Per the Hyperliquid docs [[1]](#sources)[[2]](#sources):
 
 - **Tier 1 — the book.** "The positions are first attempted to be entirely closed by sending market
   orders to the book."
-- **Tier 2 — the liquidator vault.** "If the account equity drops below 2/3 of the maintenance margin
-  without successful liquidation through the book," then "positions that are below 2/3 of the
-  maintenance margin can be taken over by the liquidator vault, which is a component strategy of HLP."
-- **Tier 3 — ADL.** "Auto-deleveraging is an important final safeguard on the solvency of the
-  platform"; a user "who has no open positions will not socialize any losses of the platform."
+- **Tier 2 — the liquidator vault.** "Positions that are below 2/3 of the maintenance margin can be taken
+  over by the liquidator vault, which is a component strategy of HLP." Maintenance margin "is half of the
+  initial margin at max leverage, which varies from 3-40x."
+- **Tier 3 — ADL.** "If a user's account value … becomes negative," opposite-side traders "are ranked by
+  unrealized pnl and leverage used" and "their positions are closed at the previous mark price against the
+  now underwater user, ensuring that the platform has no bad debt."
 
-So HLP depositors are not a first-instance insurance fund — they are the *second* line, capitalised at
-the liquidator-vault/perp-slot level, with ADL socialising the residual to profitable counterparties.
+Two consequences the "insurance fund" framing misses. First, HLP depositors are the *second* line, and
+their loss is **capped** at the liquidator-vault/perp-account capital: past that, ADL — not the fund —
+absorbs the residual. Second, ADL does not *reimburse* the vault; it **caps** the vault's loss by closing
+solvent traders' opposite positions at the previous mark (the cost comes out of those traders' unrealised
+gains, not a payment into the vault).
 
 ## Data and method
 
-All figures come from one point-in-time snapshot of the public `info` endpoint
-(`meta`, `metaAndAssetCtxs`, and `vaultDetails` for the HLP vault
-`0xdfc24b077bc1425ad1dea75bcb6f8158e10df303`). The collector stores the raw payload; the analysis is
-pure post-processing. **Reproducible aggregates** are the cumulative-PnL, mean, σ and decomposition
-figures below; the *bucket edges* of the `allTime` window are **not** stable (the API re-buckets to
-~101 points on every snapshot), so individual interval dates are indicative, not fixed.
+One point-in-time snapshot of the public `info` endpoint (`meta`, `metaAndAssetCtxs`, `vaultDetails` for
+`0xdfc24b077bc1425ad1dea75bcb6f8158e10df303`), plus live `clearinghouseState` / `spotClearinghouseState`
+cross-checks. The collector stores the raw payload; analysis is pure post-processing.
 
-## What the record shows (observations)
+**Granularity caveat (up front):** `vaultDetails` resolves full history only at ~14-day steps (sub-daily
+only for the last ~31 days). Reproducible figures are the aggregates (cumulative PnL, decomposition,
+σ); the `allTime` bucket *edges* are **not** stable (the API re-buckets each snapshot), so individual
+interval dates are indicative and all extremes below are **sampled/observed**, not true extrema.
 
-| Metric | Value |
-|---|---|
-| HLP equity | **$177.4M** = net deposits $38.6M + cumulative PnL $138.8M |
-| Equity peak | $603.9M (2025-09-03) → now −71%, **all of it withdrawals** |
-| Perp/strategy slot (fronts the liquidator vault) | **$37.6M** (peak $309.3M, −88%); `maxDistributable` = $37.637M (≡ slot); `maxWithdrawable` = $0 |
-| Cumulative PnL since 2023-05 | +$138.8M |
-| ~14-day interval PnL (n=100) | mean +$1.39M, σ $4.62M; best +$41.44M (z=8.66), worst −$4.66M (z=−1.31) |
-| Skew | **7.0 — of which ~6.5 is one interval** (Oct-2025); 4.7 without it |
-| Total perp OI | **$11.6B**; BTC 30.7% + ETH 22.8% + HYPE 13.8% = 67% |
-| Leverage caps (234 perps) | 3x: 130 · 5x: 63 · 10x: 35 · 20x: 4 · 25x: 1 (ETH) · 40x: 1 (BTC) |
-| Reported APR / leader commission | 3.65% / 0 |
+## Finding 1 — a ~$37M hard cap, and ~79% of the headline capital isn't in public accounts
 
-The return series is positively skewed, and the skew is essentially one windfall — not evidence of a
-structurally benign distribution from 100 points.
+The $177.4M is HLP's total portfolio equity. The capital that actually fronts backstop liquidations is the
+**perp account**: live `clearinghouseState` reports **accountValue ≈ $37.3M, zero open positions, and
+essentially all of it withdrawable**; the snapshot's `perpAllTime` slot agrees (~$37.6M). Because ADL
+guarantees "no bad debt" by socialising beyond that point, **~$37.3M is a mechanical ceiling on depositor
+loss**, not a fraction to be divided into OI. (The liquidator vault is *one* component strategy of the
+perp slot, so its own capital is **at most** ~$37.3M.)
 
-## Finding 1 — the backstop capital is ~$38M, and the tail routes to ADL
+Where is the other **$139.8M** ($177.4M − $37.6M)? Not at the vault address: its spot balances are
+**empty**, and the leader address holds ~$464 plus dust. So the public API, queried at the vault, accounts
+for only **~21%** of the reported portfolio equity. The likely explanation is sub-accounts or component
+strategies not exposed by address-level queries — but as it stands, **79% of HLP's stated capital is not
+publicly locatable**, which is a transparency gap a depositor cannot independently verify.
 
-The $177M is HLP's total equity across its component strategies. The liquidator vault that actually
-takes over sub-2/3-MM positions is one *perp* strategy; the snapshot's perp slot is **$37.6M**, and the
-vault's `maxDistributable` equals that figure to the dollar. Beyond the liquidator vault's capacity,
-losses do not draw down "the fund" — they socialise via **ADL** onto the most-profitable opposing
-positions. The real backstop of last resort is therefore other traders and, in the extreme, validator
-intervention — not a thick reserve.
+*What would falsify this:* Hyperliquid naming the accounts/strategies holding the other $139.8M, or the
+liquidator vault being capitalised above the perp account. Neither is visible in the current API/docs.
 
-*What would falsify this:* Hyperliquid disclosing that the liquidator vault is capitalised well above
-the perp slot (e.g. can draw on the full $177M), or ADL being bounded/insured such that socialisation
-cannot reach solvent traders. Neither is stated in the current docs.
+## Finding 2 — the capital is procyclical (the real buffer risk)
 
-## Finding 2 — the capital is procyclical (and that is the real buffer risk)
-
-![HLP equity vs cumulative PnL](hl_equity_vs_pnl.svg)
+![HLP equity, cumulative PnL and net deposits](hl_equity_vs_pnl.svg)
 
 Decomposing `equity = net deposits + cumulative PnL`:
 
-- From the **2025-09-03 peak** ($603.9M) to now ($177.4M): **dEquity −$426.5M = PnL +$62.6M + net flows
-  −$489.1M.** The contraction is depositors leaving, not losses.
-- **Mar-2025:** equity ran $509M → $150M in five weeks (~−$357M), again almost entirely flows; the
-  interval containing the JELLY resolution (delisting ~03-26) had **+$1.24M of PnL and −$160.3M of net
-  outflow**. The event is invisible in the *PnL* curve but very visible in *capital*.
+- From the **sampled peak 2025-09-03** ($603.9M) to now ($177.4M): **dEquity −$426.5M = PnL +$62.6M +
+  net flows −$489.1M.** The contraction is depositors leaving, not losses.
+- **Mar-2025:** $509M → $150M in five weeks (~−$357M), almost all flows; the interval containing the JELLY
+  resolution had **+$1.24M of PnL and −$160.3M of net outflow** — the event is invisible in the *PnL*
+  curve but very visible in *capital*.
 
-The risk this surfaces is not "the fund took a loss"; it is that **HLP's loss-absorbing capital is
-largest in calm markets and contracts fastest around stress**, because the same events that stress the
-backstop also prompt depositors to withdraw. A buffer that mean-reverts downward under stress is the
-opposite of what a backstop should do.
+So the pattern is one sharp five-week drain (Mar-2025) and a **13-month monotonic decline since Sep-2025**.
+The monotonicity matters more than the speed: this looks like a steady **repricing of the yield down**, not
+a panic — and it means HLP's loss-absorbing capital is largest in calm markets and thinnest after stress.
 
-*What would falsify this:* evidence that deposits are sticky or lock up through stress (they do not —
-`maxWithdrawable` fluctuates and the Mar/Sep episodes show fast exits), or a protocol-owned,
-non-withdrawable first-loss tranche.
+*Note on withdrawals:* `vaultDetails.maxWithdrawable` is caller-relative (0 for a non-depositor) and is
+**not** evidence of a lockup; HLP's deposit-lock terms would modulate exit speed but do not change the
+observed multi-month drain. This finding rests on the equity/PnL/flow decomposition, which is exact.
 
-## Finding 3 — the thin cushion is BTC/ETH at max leverage; the worst events are idiosyncratic
+## Finding 3 — the thin cushion is BTC/ETH at max leverage; worst events are idiosyncratic
 
-Maintenance margin is **half the initial margin at max leverage**, so the cushion before the liquidator
-vault is underwater on an inherited position ≈ (2/3)·MM of notional:
+Maintenance margin is **half the initial margin at max leverage** [[1]](#sources), so the cushion before
+the liquidator vault is underwater on an inherited position ≈ (2/3)·MM of notional:
 
 | Max leverage | Maintenance margin | Cushion ≈ (2/3)·MM | Example |
 |---|---|---|---|
@@ -123,86 +112,84 @@ vault is underwater on an inherited position ≈ (2/3)·MM of notional:
 | 5x | 10.0% | 6.67% | ATOM |
 | 3x | 16.7% | 11.1% | long tail |
 
-The thinnest cushions sit on the **deepest books (BTC, ETH)** at max leverage — where a gap through
-<1% of notional hands the vault an underwater position — *not* on the low-OI alts that a
-"share-of-OI" lens flags. OI concentration and tail fragility point at different assets.
+The thinnest cushions are on the **deepest books (BTC, ETH)** at max leverage — a gap through <1.3% of
+notional hands the vault an underwater position — *not* the low-OI alts a share-of-OI lens flags.
 
-Separately, the worst *realized* backstop event to date was **not** market beta. JELLY (Mar-2025) was a
-manipulated, thinly-listed market: public post-mortems put the unrealized hit at **roughly
-$10–13.5M** before validators **delisted the market** and settled at an oracle price, leaving HLP
-~+$0.7M [[Halborn]](#sources). POPCAT is reported at ~−$4.9M [[reports]](#sources); notably it does
-**not** show up as a negative ~14-day interval in the vault curve. That is the point:
+Separately, the worst realized backstop event was **not** market beta. JELLY (Mar-2025) was a manipulated,
+thinly-listed market: Halborn reports that "when losses reached **$12 million**, the protocol's validators
+rapidly … delist[ed] the $JELLY token," settling at $0.0095 vs the $0.50 listing [[3]](#sources). The
+point stands independent of the exact figure:
 
-> ~14-day interval nets are **not** event losses. The largest *known event* losses (≈−$4.9M POPCAT,
-> ≈−$10–13.5M mark on JELLY) exceed the worst observed interval (−$4.66M, a statistically unremarkable
-> z = −1.31) — which is exactly why the realized curve cannot be read as a measure of the tail.
-
-*What would falsify this:* trade-level HLP data showing inherited BTC/ETH inventory consistently
-unwound inside the cushion, or the idiosyncratic events being contained by capital rather than by
-delisting. The public data can neither confirm nor refute this at the needed resolution — which is
-itself the finding.
+> ~14-day interval nets are **not** event losses. The largest known event loss (~$12M on JELLY) exceeds
+> the worst *observed* interval (−$4.66M, a statistically unremarkable z = −1.31), which is exactly why the
+> realized curve cannot be read as a measure of the tail.
 
 ## A labelled scenario (not a prediction): HYPE reflexivity
 
 HYPE — the ecosystem's own token — is 13.8% of OI ($1.6B) at 10x. The API gives no long/short split;
-funding is positive (longs pay), so longs likely dominate, but this is **not sized**, so the
-inheritance fraction `f` below is an uncalibrated assumption. Loss `= f · $1.6B · c` (c = adverse
-unwind cost), against the **~$38M** perp/liquidator capital:
+funding is positive (longs pay), so longs likely dominate, but this is **not sized**, so `f` is an
+uncalibrated assumption. Using the Finding-3 cushion, an inherited HYPE position only costs the vault
+beyond its 3.33% margin, so loss `= f · $1.6B · max(0, c − 3.33%)`, against the **~$37.3M** perp cap:
 
 | f \ c | 5% | 10% | 20% | 30% |
 |---|---|---|---|---|
-| 5% | 11% | 21% | 43% | 64% |
-| 10% | 21% | 43% | 86% | 128% |
-| 20% | 43% | 86% | 171% | 257% |
+| 5% | 4% | 14% | 36% | 57% |
+| 10% | 7% | 29% | 71% | 114% |
+| 20% | 14% | 57% | **143%** | 228% |
 
-(loss as % of the ~$38M perp capital). At f = 20%, c = 30% the loss is ~$97M — the liquidator vault is
-exhausted several times over and the remainder routes to ADL. The purpose is sensitivity, not forecast:
-it shows the backstop's first-loss capital is small relative to a single concentrated, reflexive market.
+(loss as % of the ~$37.3M perp cap). At f = 20%, c = 20% the loss is ~$54M — the liquidator vault is
+exhausted and the remainder routes to ADL. This follows from the protocol's own cushion mechanics; it is a
+sensitivity point, not a forecast.
+
+## Other sign-sensitive channels
+
+- **USDC depeg.** HLP's capital is USDC-denominated; a depeg (cf. Mar-2023) hits the buffer directly, with
+  no market move required — a risk orthogonal to everything above.
+- **Validator concentration.** The one true near-miss (JELLY) was resolved by **delisting**, a 2/3
+  stake-weighted validator vote. The third backstop tier therefore rests on a small set of operators;
+  depositors should price validator discretion, not an automatic rule.
 
 ## Recommendations
 
-**For an HLP depositor.** The ~3.65% APR is *not* compensation for the tail — it is mechanically a
-shrinking-base artifact: as capital fell $604M → $177M, the same PnL divided by less capital raises the
-APR. A rising HLP APR is a signal of a thinner buffer, not a thicker cushion. Size exposure to a vault
-whose first-loss capital is ~$38M, whose worst case routes to ADL, and whose capital leaves under
-stress.
+**For an HLP depositor.** The ~3.65% APR is *not* tail compensation — it is mechanically a
+shrinking-base artifact: as capital fell $604M → $177M, the same PnL over less capital raises the APR. A
+rising HLP APR signals a thinner buffer. Your loss is capped at the ~$37M perp account; beyond it you are
+subject to ADL on the other side of the book, and ~79% of the headline capital is not publicly locatable.
 
-**For a risk mandate.** The highest-value transparency ask is **not** "disclose flows" — deposit/
-withdraw flows are already public via `userNonFundingLedgerUpdates` (paginated, since 2023-05-04). Ask
-instead for **intra-event HLP PnL and inherited inventory by market**, which is the only thing that
-would let anyone evidence tail safety. Then cap single-market backstop concentration, treating HYPE
-explicitly for its reflexivity.
+**For a risk mandate.** Deposit/withdraw flows are already public (`userNonFundingLedgerUpdates`,
+paginated, since 2023-05-04), so the ask is not "disclose flows." Ask for (a) the accounts/strategies
+holding the unlocated $139.8M, and (b) intra-event HLP PnL and inherited inventory by market — the only
+data that would let anyone evidence tail safety. Then cap single-market backstop concentration (HYPE
+first, for reflexivity).
 
-**For validators.** Because the one true near-miss (JELLY) was resolved by **delisting** — a 2/3
-stake-weighted governance action — the backstop-of-last-resort is validator discretion. Make the
-trigger and process for such intervention explicit; an implicit discretionary backstop should not be
-priced by depositors as if it were automatic.
+**For validators.** Make the trigger and process for discretionary intervention (as in the JELLY delist)
+explicit; an implicit, stake-weighted backstop-of-last-resort should not be priced by depositors as if it
+were automatic.
 
 ## Limitations
 
-- One public snapshot; no privileged or trade-level data. `vaultDetails` resolves full history only at
-  ~14-day steps (sub-daily only for the last ~31 days), so intra-event dynamics are not observable.
-- The liquidator-vault = perp-slot identification rests on the `maxDistributable` match and the docs'
-  "component strategy of HLP"; Hyperliquid does not publish the vault's capital separately.
-- Incident magnitudes are from public post-mortems (secondary) and vary by source; used for mapping,
-  not re-derived. The HYPE scenario's `f`, `c` are assumptions.
+- One public snapshot; no privileged or trade-level data; ~14-day history resolution hides intra-event
+  dynamics. Extremes quoted are sampled/observed, not true extrema.
+- The liquidator-vault ≤ perp-account identification rests on the docs ("a component strategy of HLP") and
+  the live `clearinghouseState` perp account; Hyperliquid does not publish the vault's capital separately,
+  and $139.8M of portfolio equity is not locatable in public accounts (possible sub-accounts).
+- The JELLY magnitude is Halborn's single figure; the HYPE scenario's `f`, `c` are assumptions.
 - Independent analysis, not an audit, not affiliated with Hyperliquid.
 
 ## Sources
 
 1. Hyperliquid docs — Liquidations: https://hyperliquid.gitbook.io/hyperliquid-docs/trading/liquidations
-   (verbatim: "first attempted to be entirely closed by sending market orders to the book"; "below 2/3
-   of the maintenance margin … taken over by the liquidator vault, which is a component strategy of
-   HLP"; "maintenance margin is half of the initial margin at max leverage, which varies from 3-40x").
+   ("first attempted to be entirely closed by sending market orders to the book"; "below 2/3 of the
+   maintenance margin … taken over by the liquidator vault, which is a component strategy of HLP";
+   "maintenance margin is half of the initial margin at max leverage, which varies from 3-40x").
 2. Hyperliquid docs — Auto-deleveraging: https://hyperliquid.gitbook.io/hyperliquid-docs/trading/auto-deleveraging
-   ("an important final safeguard on the solvency of the platform"; a user "who has no open positions
-   will not socialize any losses").
+   ("If a user's account value … becomes negative"; ranked "by unrealized pnl and leverage used"; "closed
+   at the previous mark price against the now underwater user, ensuring that the platform has no bad debt").
 3. Halborn — "Explained: The Hyperliquid JELLY incident (March 2025)":
-   https://www.halborn.com/blog/post/explained-the-hyperliquid-hack-march-2025
-4. HLP vault (`0xdfc24b077bc1425ad1dea75bcb6f8158e10df303`) via the public `info` API — primary data.
-
-*(POPCAT / ETH-long magnitudes are from community post-mortems; exact tx references not independently
-re-derived here.)*
+   https://www.halborn.com/blog/post/explained-the-hyperliquid-hack-march-2025 ("when losses reached $12
+   million … delist the $JELLY token"; settled valuing $JELLY at $0.0095 vs the $0.50 listing).
+4. HLP vault `0xdfc24b077bc1425ad1dea75bcb6f8158e10df303` via the public `info` API (`vaultDetails`,
+   `clearinghouseState`, `spotClearinghouseState`) — primary data.
 
 ## Reproducibility
 
@@ -210,7 +197,7 @@ re-derived here.)*
 python research/hl_collect.py        # snapshot the public API into data/hl/ (git-ignored)
 python research/hl_analysis.py       # factual summary
 python research/hl_risk_calcs.py     # the findings' numbers
-python research/hl_figures.py        # the equity-vs-PnL chart (SVG)
+python research/hl_figures.py        # the equity / PnL / net-deposits chart (SVG)
 ```
 
 *Not financial advice. Independent research for discussion.*
