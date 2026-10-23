@@ -66,8 +66,8 @@ so interval dates are indicative and all extremes below are **sampled/observed**
 
 The liquidation channel's capital is the **perp account**: live `clearinghouseState` reports
 **accountValue ≈ $37.3M, zero open positions, essentially all withdrawable**; the snapshot's `perpAllTime`
-slot agrees (~$37.3M; `clearinghouseState.accountValue == perpAllTime` to well under $1). Because ADL
-guarantees "no bad debt" by socialising beyond that
+slot agrees (~$37.3M; `clearinghouseState.accountValue == perpAllTime` to within about a dollar, the two
+endpoints being sampled seconds apart). Because ADL guarantees "no bad debt" by socialising beyond that
 point, **~$37.3M is a mechanical ceiling on backstop loss** (the liquidator vault being "a component
 strategy" of that perp slot, so its own capital is **at most** ~$37.3M).
 
