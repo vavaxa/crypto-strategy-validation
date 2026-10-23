@@ -26,9 +26,9 @@ risk that ADL does not bound**. A full HLP risk picture would have to cover thos
 2. **That capital is procyclical — but toward yield, not away from stress.** The largest single inflow
    (+$92.2M) landed in the **crash/deleveraging fortnight of Oct-2025 — the same interval as the +$41.4M
    trading windfall.** Depositors chase visible yield *into* stress and bleed *out* in calm markets as the
-   yield fades (inflows +$296M vs outflows −$785M after the Sep-2025 peak, across 8 separate inflow
-   intervals — not a monotonic drain). The one true run was JELLY (Mar-2025). And a **4-day deposit
-   lock-up** means no depositor can exit inside an event.
+   yield fades (after the Sep-2025 peak: +$296M in across 9 intervals vs −$785M out across 21 — not a
+   monotonic drain). The one true run was JELLY (Mar-2025). And a **4-day deposit lock-up** means no
+   depositor can exit inside an event.
 3. **The thin margin cushion is BTC/ETH at max leverage (~0.83% / ~1.33% of notional)** — the deepest
    books — not the low-OI alts a share-of-OI lens would flag.
 
@@ -88,7 +88,7 @@ Decomposing `equity = net deposits + cumulative PnL`, from the sampled peak 2025
 ($177.4M): **dEquity −$426.5M = PnL +$62.6M + net flows −$489.1M.** The contraction is withdrawals, not
 losses. But the flows are **not** a monotonic flight:
 
-- After the peak, **+$296M flowed in across 8 separate intervals** against −$785M out.
+- After the peak, **+$296M flowed in across 9 intervals** against −$785M out across 21.
 - The **largest inflow (+$92.2M) was the Oct-2025 crash/deleveraging fortnight** — the *same* interval as
   the +$41.4M trading windfall. Depositors piled in *because* HLP visibly printed money in the crash.
 - The one genuine run was **JELLY (Mar-2025): −$160.3M of outflow** in the interval around the delisting,
@@ -130,6 +130,10 @@ decentralized than it claimed" [[5]](#sources).
 > the worst *observed* interval (−$4.66M, a statistically unremarkable z = −1.31), which is exactly why the
 > realized curve cannot be read as a measure of the tail.
 
+*What would falsify this:* trade-level data showing inherited BTC/ETH inventory is consistently unwound
+inside the <1.3% max-leverage cushion (so the deepest books never actually stress the vault). The public
+~14-day data can neither confirm nor refute it — which is itself the limit.
+
 ## A labelled scenario (not a prediction): HYPE reflexivity
 
 HYPE — the ecosystem's own token — is 13.8% of OI ($1.6B) at 10x. No long/short split in the API; funding
@@ -151,8 +155,8 @@ not a forecast.
 
 ## Other sign-sensitive channels
 
-- **USDC depeg.** HLP's capital (all four strategies) is USDC-denominated; a depeg (cf. Mar-2023) hits it
-  directly, with no market move required.
+- **USDC depeg.** HLP's NAV is USDC-quoted and the Earn leg is a USDC claim, so a depeg (cf. Mar-2023)
+  hits that directly with no market move required (the market-making inventory is held in tokens).
 - **Validator concentration.** JELLY was resolved by **delisting** — a 2/3 stake-weighted validator vote
   that "revealed that Hyperliquid was far less decentralized than it claimed" [[5]](#sources). The third
   backstop tier rests on a small operator set; depositors should price validator discretion, not an

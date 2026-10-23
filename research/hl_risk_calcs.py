@@ -43,13 +43,19 @@ def main():
     ipk = int(np.argmax(a))
     print(f"  from equity peak {ts(t[ipk])} (${a[ipk]/1e6:,.1f}M): dEquity ${(a[-1]-a[ipk])/1e6:,.1f}M "
           f"= PnL ${(p[-1]-p[ipk])/1e6:,.1f}M + net flows ${((a[-1]-a[ipk])-(p[-1]-p[ipk]))/1e6:,.1f}M")
-    print("  => the 71% contraction is withdrawals, NOT losses. Two rapid ~70% drawdowns of capital:")
-    # March 2025 contraction
-    def eq_on(prefix):
-        idx = [i for i in range(len(t)) if ts(t[i]).startswith(prefix)]
-        return idx
-    print(f"     - Mar 2025: $509M (03-05) -> $150M (04-09) in 5 weeks, ~-$357M, almost all flows")
-    print(f"     - Sep 2025 -> now: -$489M flows against +$63M PnL")
+    print("  => the 71% contraction is withdrawals, NOT losses. Flow decomposition after the peak:")
+    infl = outfl = 0.0; nin = nout = 0; big = (-1.0, "", "", 0.0)
+    for i in range(ipk + 1, len(a)):
+        flow = (a[i] - a[i-1]) - (p[i] - p[i-1]); dpnl = p[i] - p[i-1]
+        if flow > 0: infl += flow; nin += 1
+        else: outfl += flow; nout += 1
+        if flow > big[0]: big = (flow, ts(t[i-1]), ts(t[i]), dpnl)
+    print(f"     inflows +${infl/1e6:,.0f}M across {nin} intervals; outflows ${outfl/1e6:,.0f}M across {nout}; "
+          f"net ${(infl+outfl)/1e6:,.0f}M")
+    print(f"     largest inflow +${big[0]/1e6:,.0f}M ({big[1]}->{big[2]}), same-bucket PnL +${big[3]/1e6:,.0f}M "
+          f"-- capital chased the crash windfall IN")
+    print(f"     => procyclical toward realised yield (in after stress, out in calm); the only true run was")
+    print(f"        JELLY (Mar-2025, ~-$160M interval). NOT a monotonic drain.")
 
     print("\n" + "=" * 74)
     print("BACKSTOP CAPITAL — perp account is the hard cap; where is the rest? (observation)")
