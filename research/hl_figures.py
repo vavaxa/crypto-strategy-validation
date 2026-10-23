@@ -33,8 +33,6 @@ def main():
     def Y(v): return MT + (1 - v / ymax) * PH
     def poly(ys): return " ".join(f"{X(t[i]):.1f},{Y(ys[i]):.1f}" for i in range(len(ys)))
 
-    gap = ([f"{X(t[i]):.1f},{Y(eq[i]):.1f}" for i in range(len(eq))] +
-           [f"{X(t[i]):.1f},{Y(pnl[i]):.1f}" for i in range(len(pnl) - 1, -1, -1)])
     peak_i = eq.index(max(eq))
     mar = int(datetime(2025, 3, 5, tzinfo=timezone.utc).timestamp() * 1000)
 
@@ -45,7 +43,7 @@ def main():
     s.append(f'<text x="{ML}" y="26" font-size="15" font-weight="700" fill="#111">'
              'HLP: the 2025 contraction is withdrawals, not losses</text>')
     s.append(f'<text x="{ML}" y="44" font-size="12" fill="#555">'
-             'equity − cumulative PnL = net depositor capital (shaded / orange line)</text>')
+             'net depositor capital (orange) = equity − cumulative PnL; falls via withdrawals, not losses</text>')
     # y grid + labels
     v = 0
     while v <= ymax:
@@ -66,9 +64,7 @@ def main():
                  'stroke="#d97706" stroke-width="1.2" stroke-dasharray="5 3"/>')
         s.append(f'<text x="{X(mar)+5:.1f}" y="{MT+PH-6:.1f}" font-size="10.5" fill="#b45309">'
                  'Mar-2025: −$360M in 5 weeks, PnL flat</text>')
-    # shaded net-deposit gap
-    s.append(f'<polygon points="{" ".join(gap)}" fill="#3b82f6" fill-opacity="0.09"/>')
-    # lines
+    # lines (no fill: orange net-deposits line is the single encoding)
     s.append(f'<polyline points="{poly(nd)}" fill="none" stroke="#ea580c" stroke-width="2"/>')
     s.append(f'<polyline points="{poly(pnl)}" fill="none" stroke="#16a34a" stroke-width="2"/>')
     s.append(f'<polyline points="{poly(eq)}" fill="none" stroke="#2563eb" stroke-width="2"/>')

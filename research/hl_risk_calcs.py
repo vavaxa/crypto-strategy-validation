@@ -73,10 +73,11 @@ def main():
         cap = ap[-1]
     spot = snap.get("hlp_spotClearinghouseState", {}).get("balances", [])
     gap = a[-1] - ap[-1]
-    print(f"  => depositor loss is mechanically capped at the ~${cap/1e6:,.0f}M perp account; ADL beyond it.")
-    print(f"     Vault spot balances: {len(spot)}. The other ${gap/1e6:,.0f}M of the ${a[-1]/1e6:,.0f}M headline")
-    print(f"     is NOT locatable in the vault's public perp/spot accounts (~{gap/a[-1]*100:.0f}% unlocated; "
-          f"possible sub-accounts).")
+    print(f"  => backstop loss is mechanically capped at the ~${cap/1e6:,.0f}M perp account; ADL beyond it.")
+    print(f"     Vault spot balances at this address: {len(spot)}. The other ${gap/1e6:,.0f}M of the "
+          f"${a[-1]/1e6:,.0f}M NAV (~{gap/a[-1]*100:.0f}%) is HLP's Earn/market-making strategies, which the")
+    print(f"     API exposes only by their own sub-account addresses (docs) -- NOT a gap; per-strategy NAV")
+    print(f"     is simply not published. This note covers the liquidation channel (the ~${cap/1e6:,.0f}M).")
 
     print("\n" + "=" * 74)
     print("MAINTENANCE-MARGIN CUSHION by leverage tier (the real thinness)")
